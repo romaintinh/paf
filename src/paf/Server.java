@@ -1,6 +1,7 @@
 package paf;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 
 public class Server {
 	public ArrayList<Task> hiTasks;
@@ -10,6 +11,12 @@ public class Server {
 	public int ts;
 	// fin
 	public int hyperP;
+	
+	public Server() {
+		this.hiTasks =null ;
+		this.loTasks =null ;
+		this.hyperP = 0;
+	}
 	
 	public Server(ArrayList<Task> hiTasks, ArrayList<Task> loTasks) {
 		this.hiTasks =hiTasks ;
@@ -44,29 +51,26 @@ public class Server {
 		if (ULo()>UHi()) return false;
 		return true;
 	}
-	// fonction analytique de sbf
-	private double sbf(int t, Task ta) {
-		double temp = t-(ta.period - ta.cHi);
-		temp = Math.floor(temp/ta.period)*ta.cHi;
-		temp+= Math.max(t-2*(ta.period-ta.cHi)-ta.period*Math.floor(t-(ta.period - ta.cHi)/ta.period), 0);
-		return(temp);
-	}
-	// fonction analytique de dbf
+
 	
-	private double dbf(int t, Task ta) {
-		return Math.floor(t/ta.period)*ta.cLo;
-	}
-	
-	private ArrayList<Double> SBF(){
-		for(Task hiTask : hiTasks) {
-			if ()
+	public boolean SDBF(){
+		double sbf=0;
+		double dbf=0;
+		for (int i=0; i <= hyperP; i++) {		
+			for(Task hiTask : hiTasks) {
+				sbf+= hiTask.func(i*hyperP);
+			}
+			for(Task loTask : loTasks) {
+				dbf+= loTask.func(i*hyperP);
+			}
+			if (sbf<dbf) return false;
+			sbf=0;
+			dbf=0;
 		}
+		return true;
 	}
 	
 	
-	public boolean SDBF() {
-		
-	}
 	
 	private int PPCM(int a, int b){
 		int A=a;
@@ -89,5 +93,49 @@ public class Server {
 			i+=1;
 		}
 		return ppcm;
+	}
+	
+	public double Utilisation() {
+		int cLo = 0;
+		for (Task loTask : loTasks) {
+			cLo += loTask.cLo;
+		}
+		return cLo;
+	}
+	
+	public Server BitSet2Server(BitSet hi, BitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
+		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
+		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
+		for ( int indice : getSetBits(hi)) {
+			hiServerTask.add(globalHiTasks.get(indice));
+		}
+		for ( int indice : getSetBits(lo)) {
+			loServerTask.add(globalLoTasks.get(indice));
+		}
+		return new Server(hiServerTask,loServerTask);
+	}
+	
+	private static ArrayList<Integer> getSetBits(BitSet b)
+	{
+		ArrayList<Integer> resultat = new ArrayList<Integer>();
+		for (int i=0; i<b.size(); i++) 
+		{
+			if(b.get(i)) resultat.add(i);
+		}
+		return resultat;
+	}
+	// test du critère de séquentialité
+	public boolean testSeqY() 
+	{
+		double temp = this.UHi();
+		if (temp>1) return false;
+		return true;
+	}
+	
+	public boolean testSeqX() 
+	{
+		double temp =this.ULo();
+		if (temp>1) return false;
+		return true;
 	}
 }
