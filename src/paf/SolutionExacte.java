@@ -89,36 +89,58 @@ public class SolutionExacte {
 	}
 	
 	public TreeMap<AddBitSet,ArrayList<AddBitSet>> maps() {
+		
+		// variables d'optimisation
+		ArrayList<AddBitSet> Xsorted = new ArrayList<AddBitSet>();
+		ArrayList<AddBitSet> WrongCombination = new ArrayList<AddBitSet>();
+		AddBitSet temp = new AddBitSet(lo);
+		
+		// variables utiles pour obtenir l'ensemble des mappings valides
 		TreeMap<AddBitSet,ArrayList<AddBitSet>> maps = new TreeMap<AddBitSet,ArrayList<AddBitSet>>();
 		ArrayList<AddBitSet> tempLo = new ArrayList<AddBitSet>();
 		Server s = new Server();
 		AddBitSet Y = new AddBitSet(hi);
 		AddBitSet X = new AddBitSet(lo);
-		ArrayList<AddBitSet> Xsorted = new ArrayList<AddBitSet>();
+		
 		for (int i =0;i<Math.pow(2, lo);i++) 
 		{
 			Xsorted.add(X);
 			X.plusUn();
 		}
-		Xsorted.sort(AddBitSet);
-		// possibilité de prendre avantage des inclusion pour éviter des tests
+		Xsorted.sort(AddBitSet.BitSetCardinalityComparator);
+	
 		for (int i = 0;i< Math.pow(2, hi);i++) 
 		{
-			for (int j = 0;j< Math.pow(2, lo);j++) 
+			s.BitSet2ServerHI(Y, hiTasks);
+			if (s.testSeqY()==false) break;
+			outerloop:
+			for (AddBitSet Xc : Xsorted) 
 			{
-				s.BitSet2Server(Y, X, hiTasks, loTasks);
-				if (s.testSeqY()==false) break;
-				if (s.testSeqX()==false) break;
-				if (s.isDiv()) tempLo.add(X);
+				/* si on a déjà testé une partition de PIlo incluse dans celle que l'on va tester (à Y constant) et qu'elle n'était pas valide
+				 * alors pas besoin de faire les tests, elle non plus n'est pas valable */
+				for(AddBitSet WC : WrongCombination) 
+				{
+					temp = (AddBitSet) WC.clone();
+					temp.and(Xc);
+					if(temp.equals(WC)) continue outerloop;
+				}
+				s.BitSet2ServerLO(Xc, loTasks);
+				if (s.testSeqX()==false) 
+				{
+					WrongCombination.add(Xc);
+					break;
+				}
+				if (s.isDiv()) tempLo.add(Xc);
 				else 
 				{
-					if(s.SDBF()) tempLo.add(X);
+					if(s.SDBF()) tempLo.add(Xc);
+					else WrongCombination.add(Xc);
 				}
-				X.plusUn();;
 			}
 			maps.put(Y, tempLo);
 			Y.plusUn();
 			tempLo.clear();
+			WrongCombination.clear(); 
 		}
 		return maps;
 	}

@@ -103,7 +103,7 @@ public class Server {
 		return cLo;
 	}
 	
-	public Server BitSet2Server(BitSet hi, BitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
+	public void BitSet2Server(BitSet hi, BitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
 		for ( int indice : getSetBits(hi)) {
@@ -112,7 +112,24 @@ public class Server {
 		for ( int indice : getSetBits(lo)) {
 			loServerTask.add(globalLoTasks.get(indice));
 		}
-		return new Server(hiServerTask,loServerTask);
+		this.hiTasks = hiServerTask;
+		this.loTasks = loServerTask;
+	}
+	
+	public void BitSet2ServerHI(BitSet hi, ArrayList<Task> globalHiTasks) {
+		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
+		for ( int indice : getSetBits(hi)) {
+			hiServerTask.add(globalHiTasks.get(indice));
+		}
+		this.hiTasks = hiServerTask;
+	}
+	
+	public void BitSet2ServerLO(BitSet lo, ArrayList<Task> globalLoTasks) {
+		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
+		for ( int indice : getSetBits(lo)) {
+			loServerTask.add(globalLoTasks.get(indice));
+		}
+		this.loTasks = loServerTask;
 	}
 	
 	private static ArrayList<Integer> getSetBits(BitSet b)
