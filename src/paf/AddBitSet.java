@@ -19,6 +19,7 @@ public class AddBitSet extends BitSet implements Comparable<AddBitSet>
 		sizeWhenInstanciated = i;
 	}
 	
+	// augmente la valeur en binaire de 1
 	public void plusUn() 
 	{
 		for (int i =0; i<sizeWhenInstanciated;i++) 
@@ -35,7 +36,7 @@ public class AddBitSet extends BitSet implements Comparable<AddBitSet>
 		}
 	}
 	
-	
+	// renvoie un ArrayList contenant les indices des bit valant 1
 	public ArrayList<Integer> getSetBits()
 	{
 		ArrayList<Integer> resultat = new ArrayList<Integer>();
@@ -57,19 +58,18 @@ public class AddBitSet extends BitSet implements Comparable<AddBitSet>
 		System.out.println(output);
 	}
 
-
+	// ajoute un ordre pour pouvoir trier les ensembles de AddBitSet
 	@Override
 	public int compareTo(AddBitSet o) {
 		// TODO Auto-generated method stub
 		return (this.cardinality()-o.cardinality());
 	}
 	
-	public static Comparator<AddBitSet> BitSetCardinalityComparator = new Comparator<AddBitSet>() {
-
-		public int compare(AddBitSet AddBitSet1, AddBitSet AddBitSet2) {
-
+	public static Comparator<AddBitSet> BitSetCardinalityComparator = new Comparator<AddBitSet>() 
+	{
+		public int compare(AddBitSet AddBitSet1, AddBitSet AddBitSet2) 
+		{
 			return AddBitSet1.compareTo(AddBitSet2);
-
-			}
-};
+		}
+	};
 }

@@ -1,5 +1,9 @@
 package paf;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import java.util.Iterator;
@@ -8,29 +12,85 @@ import java.util.Set;
 import java.util.SortedMap;
 
 public class SolutionExacte {
-	public int taille;
+	// variables constitutives
 	public int hi;
 	public int lo;
-	public TreeMap<AddBitSet,ArrayList<AddBitSet>> maps;
 	public ArrayList<Task> hiTasks;
 	public ArrayList<Task> loTasks;
+	// variable de la fonction maps
+	public TreeMap<AddBitSet,ArrayList<AddBitSet>> maps;
+	// variable de la fonction récursive
 	public AddBitSet unionY ;
 	public AddBitSet unionX ;
 	public ArrayList<AddBitSet[]> maxSol ;
 	public ArrayList<AddBitSet[]> Sol ;
 	public double maxU =0;
 	
-	public SolutionExacte( ArrayList<Task> hit, ArrayList<Task> lot) {
+	// constructeur vide à utiliser de pair avec loadFromTxt
+	public SolutionExacte() 
+	{
+		this.hiTasks = null;
+		this.loTasks = null;
+		this.hi = 0;
+		this.lo = 0;
+		unionY = null;
+		unionX = null;
+	}
+	
+	// load bundle of task from file in the test directory
+		public void loadFromTxt(String name) 
+		{
+			String[] content;
+			String path = "./test/" + name;
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(path));
+				String line = br.readLine();
+				while(line!=null) 
+				{
+					content = line.split("\t");
+					if (content[5]=="1") 
+					{
+						this.hiTasks.add(new Task(Integer.valueOf(content[1]),
+								Integer.valueOf(content[3]),
+								Integer.valueOf(content[4]),
+								true));
+					}
+					else 
+					{
+						this.loTasks.add(new Task(Integer.valueOf(content[1]),
+								Integer.valueOf(content[3]),
+								Integer.valueOf(content[4]),
+								false));
+					}
+					line = br.readLine();
+				}
+				this.hi = hiTasks.size();
+				this.lo = loTasks.size();
+				unionY = new AddBitSet(hi);
+				unionX = new AddBitSet(lo);
+			} catch (FileNotFoundException e) {
+				System.out.println("no such file found");
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.out.println("could not read");
+				e.printStackTrace();
+			}
+		}
+	
+	// constructeur complet
+	public SolutionExacte( ArrayList<Task> hit, ArrayList<Task> lot) 
+	{
 		this.hiTasks = hit;
 		this.loTasks = lot;
 		this.hi = hiTasks.size();
 		this.lo = loTasks.size();
-		this.taille = hi +lo;
 		unionY = new AddBitSet(hi);
 		unionX = new AddBitSet(lo);
 	}
 	
-	public void recSearch(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps, Iterator<AddBitSet> positionY,Iterator<AddBitSet> positionX) {
+	// recherche de la solution récursivement
+	public void recSearch(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps, Iterator<AddBitSet> positionY,Iterator<AddBitSet> positionX)
+	{
 		if (positionY == null) 
 		{
 			Set<AddBitSet> keys = maps.keySet();
@@ -88,7 +148,11 @@ public class SolutionExacte {
 		recSearch(maps,positionY,positionX);		
 	}
 	
-	public TreeMap<AddBitSet,ArrayList<AddBitSet>> maps() {
+	
+	// creation de l'ensemble maps qui contient les éléments élémentaires (Y (lot de tâches hi),X (lot de taches lo)) 
+	// suceptible de former une allocation complete
+	public TreeMap<AddBitSet,ArrayList<AddBitSet>> maps() 
+	{
 		
 		// variables d'optimisation
 		ArrayList<AddBitSet> Xsorted = new ArrayList<AddBitSet>();
@@ -102,13 +166,15 @@ public class SolutionExacte {
 		AddBitSet Y = new AddBitSet(hi);
 		AddBitSet X = new AddBitSet(lo);
 		
+		// l'orde est important pour parcourir X car les inclusions peuvent simplifier les calculs
 		for (int i =0;i<Math.pow(2, lo);i++) 
 		{
 			Xsorted.add(X);
 			X.plusUn();
 		}
 		Xsorted.sort(AddBitSet.BitSetCardinalityComparator);
-	
+		
+		// début de l'exploration de l'espace de solution
 		for (int i = 0;i< Math.pow(2, hi);i++) 
 		{
 			s.BitSet2ServerHI(Y, hiTasks);
@@ -145,7 +211,9 @@ public class SolutionExacte {
 		return maps;
 	}
 	
-	public Server BitSet2Server(AddBitSet hi, AddBitSet lo) {
+	// converti deux AddBitSet en un serveur
+	public Server BitSet2Server(AddBitSet hi, AddBitSet lo) 
+	{
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
 		for ( int indice : hi.getSetBits()) {
@@ -157,7 +225,8 @@ public class SolutionExacte {
 		return new Server(hiServerTask,loServerTask);
 	}
 	
-	
+	// permet d'évaluer l'utilisation d'un AddBitSet( représentant une partie d'un des deux ensemble de taches) 
+	// sans avoir à créer un serveur juste pour ce calcule
 	private double UtilisationFromBitSet(AddBitSet X) 
 	{
 		ArrayList<Integer> SetBITS = X.getSetBits();
@@ -169,6 +238,7 @@ public class SolutionExacte {
 		return temp;
 	}
 	
+	// trouve la meilleur allocation
 	public void resolution() 
 	{
 		maps = this.maps();
@@ -181,4 +251,6 @@ public class SolutionExacte {
 			System.out.println("|    tache(s) Lo" + elt[1].toString());
 		}
 	}
+	
+	
 }

@@ -35,11 +35,12 @@ public class Server {
 	private double ULo() {
 		double resultat =0;
 		for(Task loTask : loTasks) {
-			resultat += loTask.getUHi();
+			resultat += loTask.getULo();
 		}
 		return resultat;
 	}
 	
+	// test du premier critère de "Scheduability"
 	public boolean isDiv() {
 		// possibilité de stocker les valeurs déjà testés pour gagner du temps
 		for(Task hiTask : hiTasks) {
@@ -52,7 +53,7 @@ public class Server {
 		return true;
 	}
 
-	
+	// test du second critère de "Scheduability"
 	public boolean SDBF(){
 		double sbf=0;
 		double dbf=0;
@@ -71,7 +72,6 @@ public class Server {
 	}
 	
 	
-	
 	private int PPCM(int a, int b){
 		int A=a;
 		int B=b;
@@ -82,6 +82,7 @@ public class Server {
 		return A;
 	}
 	
+	// ppcm des periode d'un ensemble de taches
 	public int HyperPeriod() {		
 		ArrayList<Task> list = new ArrayList<Task>();
 		list.addAll(hiTasks);
@@ -94,61 +95,44 @@ public class Server {
 		}
 		return ppcm;
 	}
-	
-	public double Utilisation() {
-		int cLo = 0;
-		for (Task loTask : loTasks) {
-			cLo += loTask.cLo;
-		}
-		return cLo;
-	}
-	
-	public void BitSet2Server(BitSet hi, BitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
+
+	// créer un serveur à partir de bitSet
+	public void BitSet2Server(AddBitSet hi, AddBitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
-		for ( int indice : getSetBits(hi)) {
+		for ( int indice : hi.getSetBits()) {
 			hiServerTask.add(globalHiTasks.get(indice));
 		}
-		for ( int indice : getSetBits(lo)) {
+		for ( int indice : lo.getSetBits()) {
 			loServerTask.add(globalLoTasks.get(indice));
 		}
 		this.hiTasks = hiServerTask;
 		this.loTasks = loServerTask;
 	}
 	
-	public void BitSet2ServerHI(BitSet hi, ArrayList<Task> globalHiTasks) {
+	public void BitSet2ServerHI(AddBitSet hi, ArrayList<Task> globalHiTasks) {
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
-		for ( int indice : getSetBits(hi)) {
+		for ( int indice : hi.getSetBits()) {
 			hiServerTask.add(globalHiTasks.get(indice));
 		}
 		this.hiTasks = hiServerTask;
 	}
 	
-	public void BitSet2ServerLO(BitSet lo, ArrayList<Task> globalLoTasks) {
+	public void BitSet2ServerLO(AddBitSet lo, ArrayList<Task> globalLoTasks) {
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
-		for ( int indice : getSetBits(lo)) {
+		for ( int indice : lo.getSetBits()) {
 			loServerTask.add(globalLoTasks.get(indice));
 		}
 		this.loTasks = loServerTask;
 	}
 	
-	private static ArrayList<Integer> getSetBits(BitSet b)
-	{
-		ArrayList<Integer> resultat = new ArrayList<Integer>();
-		for (int i=0; i<b.size(); i++) 
-		{
-			if(b.get(i)) resultat.add(i);
-		}
-		return resultat;
-	}
-	// test du critère de séquentialité
+	// tests du critère de séquentialité
 	public boolean testSeqY() 
 	{
 		double temp = this.UHi();
 		if (temp>1) return false;
 		return true;
 	}
-	
 	public boolean testSeqX() 
 	{
 		double temp =this.ULo();
