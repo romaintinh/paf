@@ -42,10 +42,15 @@ public class Server {
 	
 	// test du premier critère de "Scheduability"
 	public boolean isDiv() {
+		
+		
 		// possibilité de stocker les valeurs déjà testés pour gagner du temps
 		for(Task hiTask : hiTasks) {
 			for (Task loTask : loTasks) {
-				if (loTask.period%hiTask.period!=0) return false;
+				if (loTask.period%hiTask.period!=0) 
+				{
+					return false;
+				}
 				
 			}
 		}
@@ -138,5 +143,15 @@ public class Server {
 		double temp =this.ULo();
 		if (temp>1) return false;
 		return true;
+	}
+	
+	public static void printArrayList(ArrayList<Task> L) 
+	{
+		for (Task t : L) 
+		{
+			System.out.print(t.period+"\t");
+			System.out.print(t.cHi+"\t");
+			System.out.println(t.cLo);
+		}
 	}
 }

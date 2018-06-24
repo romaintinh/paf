@@ -29,8 +29,8 @@ public class SolutionExacte {
 	// constructeur vide à utiliser de pair avec loadFromTxt
 	public SolutionExacte() 
 	{
-		this.hiTasks = null;
-		this.loTasks = null;
+		this.hiTasks = new ArrayList<Task>();
+		this.loTasks = new ArrayList<Task>();
 		this.hi = 0;
 		this.lo = 0;
 		unionY = null;
@@ -47,9 +47,11 @@ public class SolutionExacte {
 				String line = br.readLine();
 				while(line!=null) 
 				{
+					line = line.trim();
 					content = line.split("\t");
-					if (content[5]=="1") 
+					if (Integer.valueOf(content[5])==1) 
 					{
+
 						this.hiTasks.add(new Task(Integer.valueOf(content[1]),
 								Integer.valueOf(content[3]),
 								Integer.valueOf(content[4]),
@@ -57,6 +59,7 @@ public class SolutionExacte {
 					}
 					else 
 					{
+
 						this.loTasks.add(new Task(Integer.valueOf(content[1]),
 								Integer.valueOf(content[3]),
 								Integer.valueOf(content[4]),

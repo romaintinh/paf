@@ -1,0 +1,7 @@
+test1:
+	utilisé pour tester la fonction loadFromTxt
+testdiv:
+	le fichier contient 6 tâches, les 3 premières sont hi les 3 autres sont lo telles que:
+		{0,1,2 | 3,4} soit la limite du test
+		{0,1,2 | 3,4,5} soit non valide pour le test
+		{0,1,2 | 4,5} soit valide pour le test		 
