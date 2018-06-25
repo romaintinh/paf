@@ -12,14 +12,15 @@ public class test {
 		
 		SolutionExacte S = new SolutionExacte();
 		S.loadFromTxt("testthese");
-		S.loTasks.remove(0);
-		S.loTasks.remove(0);
-		printArrayList(S.hiTasks);
-		printArrayList(S.loTasks);
-		Server S1 = new Server(S.hiTasks,S.loTasks);
+	/*	printArrayList(S.hiTasks);
+		print("lo");
+		printArrayList(S.loTasks); */
+		S.resolution();
+		
+	/*    Server S1 = new Server(S.hiTasks,S.loTasks);
 		System.out.println(S1.SDBF());
 		
-	/*	loT = (ArrayList<Task>) S.hiTasks;
+		loT = (ArrayList<Task>) S.hiTasks;
 		hiT = (ArrayList<Task>) S.loTasks;
 		loT.remove(3);
 		Server S2 = new Server(hiT,loT);
@@ -40,6 +41,11 @@ public class test {
 			System.out.print(t.cHi+"\t");
 			System.out.println(t.cLo);
 		}
+	}
+	
+	public static void print(String L) 
+	{
+		System.out.println(L);
 	}
 
 }

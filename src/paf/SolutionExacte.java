@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import java.util.Iterator;
+import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.Set;
 import java.util.SortedMap;
@@ -22,8 +23,8 @@ public class SolutionExacte {
 	// variable de la fonction récursive
 	public AddBitSet unionY ;
 	public AddBitSet unionX ;
-	public ArrayList<AddBitSet[]> maxSol ;
-	public ArrayList<AddBitSet[]> Sol ;
+	public ArrayList<AddBitSet[]> maxSol = new ArrayList<AddBitSet[]>();
+	public ArrayList<AddBitSet[]> Sol = new ArrayList<AddBitSet[]>();
 	public double maxU =0;
 	
 	// constructeur vide à utiliser de pair avec loadFromTxt
@@ -172,33 +173,40 @@ public class SolutionExacte {
 		// l'orde est important pour parcourir X car les inclusions peuvent simplifier les calculs
 		for (int i =0;i<Math.pow(2, lo);i++) 
 		{
-			Xsorted.add(X);
+			Xsorted.add((AddBitSet) X.clone());
 			X.plusUn();
 		}
 		Xsorted.sort(AddBitSet.BitSetCardinalityComparator);
-		
+//		printXS(Xsorted); Le code fonctionne jusque là
 		// début de l'exploration de l'espace de solution
 		for (int i = 0;i< Math.pow(2, hi);i++) 
 		{
+
 			s.BitSet2ServerHI(Y, hiTasks);
-			if (s.testSeqY()==false) break;
+			if (s.testSeqY()==false) {
+				continue;
+			}
 			outerloop:
 			for (AddBitSet Xc : Xsorted) 
 			{
 				/* si on a déjà testé une partition de PIlo incluse dans celle que l'on va tester (à Y constant) et qu'elle n'était pas valide
 				 * alors pas besoin de faire les tests, elle non plus n'est pas valable */
-				for(AddBitSet WC : WrongCombination) 
+			/*	for(AddBitSet WC : WrongCombination) 
 				{
 					temp = (AddBitSet) WC.clone();
 					temp.and(Xc);
-					if(temp.equals(WC)) continue outerloop;
-				}
+					if(temp.equals(WC)) 
+					{
+						print("1");
+						continue outerloop;
+					}
+				} */
 				s.BitSet2ServerLO(Xc, loTasks);
 				if (s.testSeqX()==false) 
 				{
 					WrongCombination.add(Xc);
 					break;
-				}
+				} 
 				if (s.isDiv()) tempLo.add(Xc);
 				else 
 				{
@@ -206,7 +214,7 @@ public class SolutionExacte {
 					else WrongCombination.add(Xc);
 				}
 			}
-			maps.put(Y, tempLo);
+			maps.put((AddBitSet)Y.clone(), new ArrayList<AddBitSet>(tempLo));
 			Y.plusUn();
 			tempLo.clear();
 			WrongCombination.clear(); 
@@ -245,6 +253,8 @@ public class SolutionExacte {
 	public void resolution() 
 	{
 		maps = this.maps();
+		printM(maps);
+
 		recSearch(maps,null, null);
 		System.out.println("l'utilisation maximale est" + String.valueOf(maxU));
 		System.out.println("la solution qui produit ce résultat est :");
@@ -255,5 +265,29 @@ public class SolutionExacte {
 		}
 	}
 	
+	// debug / test
+	public static void printM(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps) 
+	{
+		NavigableSet<AddBitSet> keys = maps.navigableKeySet();
+		for (AddBitSet key : keys) 
+		{
+			System.out.println(key.toString());
+			for (AddBitSet value : maps.get(key)) 
+			{
+				System.out.println("\t"+value.toString());
+			}
+		}
+	}
 	
+	public static void print(String L) 
+	{
+		System.out.println(L);
+	}
+	
+	public static void printXS(ArrayList<AddBitSet> Xsorted) 
+	{
+		for (AddBitSet elt : Xsorted) {
+			print(elt.toString());
+		}
+	}
 }
