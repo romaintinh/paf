@@ -53,16 +53,16 @@ public class SolutionExacte {
 					{
 
 						this.hiTasks.add(new Task(Integer.valueOf(content[1]),
-								Integer.valueOf(content[3]),
-								Integer.valueOf(content[4]),
+								Double.valueOf(content[3]),
+								Double.valueOf(content[4]),
 								true));
 					}
 					else 
 					{
 
 						this.loTasks.add(new Task(Integer.valueOf(content[1]),
-								Integer.valueOf(content[3]),
-								Integer.valueOf(content[4]),
+								Double.valueOf(content[3]),
+								Double.valueOf(content[4]),
 								false));
 					}
 					line = br.readLine();

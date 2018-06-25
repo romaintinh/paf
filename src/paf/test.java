@@ -11,10 +11,13 @@ public class test {
 	{
 		
 		SolutionExacte S = new SolutionExacte();
-		S.loadFromTxt("testdiv");
-
+		S.loadFromTxt("testthese");
+		S.loTasks.remove(0);
+		S.loTasks.remove(0);
+		printArrayList(S.hiTasks);
+		printArrayList(S.loTasks);
 		Server S1 = new Server(S.hiTasks,S.loTasks);
-		System.out.println(S1.isDiv());
+		System.out.println(S1.SDBF());
 		
 	/*	loT = (ArrayList<Task>) S.hiTasks;
 		hiT = (ArrayList<Task>) S.loTasks;

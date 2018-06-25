@@ -5,3 +5,9 @@ testdiv:
 		{0,1,2 | 3,4} soit la limite du test
 		{0,1,2 | 3,4,5} soit non valide pour le test
 		{0,1,2 | 4,5} soit valide pour le test		 
+testsbfdbf:
+	le fichier contient 5 taches tq
+		{0 | 1} valide
+		{0 | 2} invalide
+		{0 | 3} limite mais valide
+		{0 | 1,4} valide composés

@@ -60,18 +60,28 @@ public class Server {
 
 	// test du second critère de "Scheduability"
 	public boolean SDBF(){
-		double sbf=0;
-		double dbf=0;
-		for (int i=0; i <= hyperP; i++) {		
-			for(Task hiTask : hiTasks) {
-				sbf+= hiTask.func(i*hyperP);
+		double sbf=(double) 0;
+		double dbf=(double) 0;
+		for (int i=0; i <= hyperP; i++) 
+		{		
+			for(Task hiTask : hiTasks) 
+			{
+				sbf+= hiTask.func(i);
 			}
-			for(Task loTask : loTasks) {
-				dbf+= loTask.func(i*hyperP);
+			for(Task loTask : loTasks) 
+			{
+				dbf+= loTask.func(i);
 			}
-			if (sbf<dbf) return false;
-			sbf=0;
-			dbf=0;
+		//	System.out.println((Double.compare(sbf, dbf)==-1));
+			if (Double.compare(sbf, dbf)==-1) 
+			{
+			/*	System.out.println(i);
+				System.out.println(sbf);
+				System.out.println(dbf); */
+				return false;
+			}
+			sbf=(double) 0;
+			dbf=(double) 0;
 		}
 		return true;
 	}
