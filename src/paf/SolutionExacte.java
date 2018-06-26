@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class SolutionExacte {
 	public ArrayList<AddBitSet[]> maxSol = new ArrayList<AddBitSet[]>();
 	public ArrayList<AddBitSet[]> Sol = new ArrayList<AddBitSet[]>();
 	public double maxU =0;
+	public boolean wasLast = false;
 	
 	// constructeur vide à utiliser de pair avec loadFromTxt
 	public SolutionExacte() 
@@ -91,26 +93,25 @@ public class SolutionExacte {
 		unionY = new AddBitSet(hi);
 		unionX = new AddBitSet(lo);
 	}
-	
+
+		
 	// recherche de la solution récursivement
-	public void recSearch(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps, Iterator<AddBitSet> positionY,Iterator<AddBitSet> positionX)
-	{
+	public void recSearch(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps, Iterator<AddBitSet> positionY, ListIterator positionX)
+	{	
+	//	printSol(Sol);
 		if (positionY == null) 
 		{
-			Set<AddBitSet> keys = maps.keySet();
+			NavigableSet<AddBitSet> keys = maps.navigableKeySet();
+		//	print(keys.toString());
 			positionY = keys.iterator();
-			
+			ArrayList<AddBitSet> values = maps.get(positionY.next()); // probleme avec le next
+			positionX = values.listIterator();
+			positionY = keys.iterator();
 		}
-		if ((positionX == null) && positionY.hasNext())
-		{
-			ArrayList<AddBitSet> values = maps.get(positionY.next());
-			positionX = values.iterator();
-		}
-		//condition d'arret
-		if (positionY.hasNext()==false && positionX.hasNext()==false) return;
 		//une solution a été trouvé on vérifie sa qualité
 		if (unionY.cardinality() == hi) 
 		{
+			print("calcul de U");
 			double Utemp=0;
 			for ( AddBitSet[] Solution : Sol) 
 			{
@@ -119,36 +120,75 @@ public class SolutionExacte {
 			if (Utemp>maxU) 
 			{
 				maxU = Utemp;
-				maxSol = Sol;
+				maxSol.clear();
+				// copie de la solution
+				for (AddBitSet[] elt : Sol)
+				{
+					maxSol.add(elt.clone());					
+				}
 			}
 			// on explore les solutions suivantes
 			Sol.remove(Sol.size()-1);
+			printSol(Sol);
+			// condition d'arret
+			if (positionY.hasNext()==false && positionX.hasNext()==false) 
+			{
+				return;
+			}
 			this.recSearch(maps, positionY, positionX);
 		}
 		// la solution partielle n'est pas complète
-		while (positionY.hasNext()) 
-		{
+		// condition d'arret
+		if (positionY.hasNext()==false && positionX.hasNext()==false) return;
+		while (positionY.hasNext())
+		{	
+			print("pass1");
+			
 			AddBitSet y = positionY.next();
-			if (y.intersects(unionY)) continue;
+			if (y.intersects(unionY)) // cas ou y = {} = unionY pas pris en compte pas intersect
+			{
+				print("continue 1");
+				continue;
+			}
 			while(positionX.hasNext()) 
 			{
-				AddBitSet x = positionX.next();
-				if (x.intersects(unionX)) continue;
+			//	print("pass2");
+				AddBitSet x = (AddBitSet) positionX.next();
+			//	print(x.toString());
+				if (x.intersects(unionX)) // cas ou x = {} = unionX pas pris en compte pas intersect
+				{
+					print("continue 2");
+					continue;
+				}
 				unionY.or(y);
+		//		print(unionY.toString());
 				unionX.or(x);
+		//		print(unionX.toString());
 				AddBitSet[] data = {y,x};
-				Sol.add(data);
+				Sol.add(data.clone());		
+				printSol(Sol);
+				print(positionY.hasNext());
 				this.recSearch(maps, positionY, positionX);
 			}
 		}
 		// il n'y a pas de solution qui commence par le contenu de Sol donc on retire le dernière élément et on continue
+		if (Sol.isEmpty() && positionY.hasNext()==false)
+		{
+			return ;
+		}
 		unionY.andNot(Sol.get(Sol.size()-1)[0]);
 		unionX.andNot(Sol.get(Sol.size()-1)[1]);
-		Sol.remove(Sol.size()-1);	
-		SortedMap<AddBitSet,ArrayList<AddBitSet>> newmaps =  maps.tailMap(Sol.get(Sol.size()-1)[0]);
-		positionY = newmaps.keySet().iterator();
+		Sol.remove(Sol.size()-1);
+		if (Sol.isEmpty() && positionY.hasNext()==false)
+		{
+			return ;
+		}
+		printSol(Sol);
+		positionY = maps.navigableKeySet().tailSet(Sol.get(Sol.size()-1)[0]).iterator();
 		ArrayList<AddBitSet> values = maps.get(positionY.next());
-		positionX = values.iterator();
+		positionY = maps.navigableKeySet().tailSet(Sol.get(Sol.size()-1)[0]).iterator(); // pour annuler le .next()
+		positionX = values.listIterator(values.indexOf(Sol.get(Sol.size()-1)[1]));
+		printSol(Sol);
 		recSearch(maps,positionY,positionX);		
 	}
 	
@@ -181,9 +221,10 @@ public class SolutionExacte {
 		// début de l'exploration de l'espace de solution
 		for (int i = 0;i< Math.pow(2, hi);i++) 
 		{
-
 			s.BitSet2ServerHI(Y, hiTasks);
-			if (s.testSeqY()==false) {
+			if (s.testSeqY()==false) 
+			{
+				Y.plusUn();
 				continue;
 			}
 			outerloop:
@@ -191,16 +232,15 @@ public class SolutionExacte {
 			{
 				/* si on a déjà testé une partition de PIlo incluse dans celle que l'on va tester (à Y constant) et qu'elle n'était pas valide
 				 * alors pas besoin de faire les tests, elle non plus n'est pas valable */
-			/*	for(AddBitSet WC : WrongCombination) 
+				for(AddBitSet WC : WrongCombination) 
 				{
 					temp = (AddBitSet) WC.clone();
 					temp.and(Xc);
 					if(temp.equals(WC)) 
 					{
-						print("1");
 						continue outerloop;
 					}
-				} */
+				} 
 				s.BitSet2ServerLO(Xc, loTasks);
 				if (s.testSeqX()==false) 
 				{
@@ -254,7 +294,6 @@ public class SolutionExacte {
 	{
 		maps = this.maps();
 		printM(maps);
-
 		recSearch(maps,null, null);
 		System.out.println("l'utilisation maximale est" + String.valueOf(maxU));
 		System.out.println("la solution qui produit ce résultat est :");
@@ -279,7 +318,7 @@ public class SolutionExacte {
 		}
 	}
 	
-	public static void print(String L) 
+	public static void print(Object L) 
 	{
 		System.out.println(L);
 	}
@@ -288,6 +327,12 @@ public class SolutionExacte {
 	{
 		for (AddBitSet elt : Xsorted) {
 			print(elt.toString());
+		}
+	}
+	public static void printSol(ArrayList<AddBitSet[]> Xsorted) 
+	{
+		for (AddBitSet[] elt : Xsorted) {
+			print(elt[0].toString()+"  "+elt[1].toString());
 		}
 	}
 }

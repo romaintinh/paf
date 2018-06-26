@@ -16,6 +16,7 @@ public class test {
 		print("lo");
 		printArrayList(S.loTasks); */
 		S.resolution();
+
 		
 	/*    Server S1 = new Server(S.hiTasks,S.loTasks);
 		System.out.println(S1.SDBF());
