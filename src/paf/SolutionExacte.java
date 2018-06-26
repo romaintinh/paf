@@ -14,6 +14,7 @@ import java.util.TreeMap;
 
 public class SolutionExacte {
 	// variables constitutives
+	int stop =0;
 	public int hi;
 	public int lo;
 	public ArrayList<Task> hiTasks;
@@ -95,8 +96,10 @@ public class SolutionExacte {
 
 		
 	// recherche de la solution récursivement
-	public void recSearch(TreeMap<OrderedAddBitSet,ArrayList<OrderedAddBitSet>> maps, Iterator<OrderedAddBitSet> positionY, ListIterator positionX)
+	public void recSearch(TreeMap<OrderedAddBitSet,ArrayList<OrderedAddBitSet>> maps, Iterator<OrderedAddBitSet> positionY, ListIterator<OrderedAddBitSet> positionX)
 	{	
+	/* if (stop>300) return;
+		stop+=1;  */
 	//	printSol(Sol);
 		if (positionY == null) 
 		{
@@ -108,7 +111,7 @@ public class SolutionExacte {
 			positionY = keys.iterator();
 		}
 		//une solution a été trouvé on vérifie sa qualité
-		if (unionY.cardinality() == hi) 
+		if (unionY.cardinality() == maps.keySet().size()) 
 		{
 			print("calcul de U");
 			double Utemp=0;
@@ -129,6 +132,11 @@ public class SolutionExacte {
 			// on explore les solutions suivantes
 			printSol(Sol);
 			if(Sol.isEmpty()) return;
+			// deux cas selon X.hasnext 
+			if (positionX.hasNext()) 
+			{
+		
+			}
 			Sol.remove(Sol.size()-1);
 			printSol(Sol);
 			// condition d'arret
@@ -213,11 +221,13 @@ public class SolutionExacte {
 			Ysorted.add((OrderedAddBitSet) Y.clone());
 			Y.plusUn();
 		}
+
 		for (int i =0;i<Math.pow(2, lo);i++) 
 		{
 			Xsorted.add((OrderedAddBitSet) X.clone());
 			X.plusUn();
 		}
+
 		// début de l'exploration de l'espace de solution
 		for (OrderedAddBitSet Ys : Ysorted) 
 		{
@@ -231,7 +241,7 @@ public class SolutionExacte {
 				s.BitSet2ServerLO(Xc, loTasks);
 				if (s.testSeqX()==false) 
 				{
-					break;
+					continue;
 				}  
 				if (s.isDiv()) {
 					tempLo.add(Xc);
