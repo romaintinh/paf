@@ -15,6 +15,7 @@ import java.util.SortedMap;
 
 public class SolutionExacte {
 	// variables constitutives
+	public int stop =0;
 	public int hi;
 	public int lo;
 	public ArrayList<Task> hiTasks;
@@ -98,6 +99,8 @@ public class SolutionExacte {
 	// recherche de la solution récursivement
 	public void recSearch(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps, Iterator<AddBitSet> positionY, ListIterator positionX)
 	{	
+		stop+=1;
+		if(stop>300) return;
 	//	printSol(Sol);
 		if (positionY == null) 
 		{
@@ -145,7 +148,7 @@ public class SolutionExacte {
 			print("pass1");
 			
 			AddBitSet y = positionY.next();
-			if (y.intersects(unionY)) // cas ou y = {} = unionY pas pris en compte pas intersect
+			if (y.intersects(unionY) || y.equals(unionY)) // cas ou y = {} = unionY pas pris en compte pas intersect
 			{
 				print("continue 1");
 				continue;
@@ -155,7 +158,7 @@ public class SolutionExacte {
 			//	print("pass2");
 				AddBitSet x = (AddBitSet) positionX.next();
 			//	print(x.toString());
-				if (x.intersects(unionX)) // cas ou x = {} = unionX pas pris en compte pas intersect
+				if (x.intersects(unionX) || x.equals(unionX)) // cas ou x = {} = unionX pas pris en compte pas intersect
 				{
 					print("continue 2");
 					continue;
