@@ -322,7 +322,7 @@ public class SolutionExacte {
 		NavigableSet<AddBitSet> keys = maps.navigableKeySet();
 		for (AddBitSet key : keys) 
 		{
-			print
+			print(key.toString()+"   "+maps.get(key).toString());
 		}
 	}
 	
