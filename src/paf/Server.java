@@ -164,4 +164,12 @@ public class Server {
 			System.out.println(t.cLo);
 		}
 	}
+
+	public void BitSet2ServerHI(AddBitSetUnordered hi, ArrayList<Task> globalHiTasks) {
+		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
+		for ( int indice : hi.getSetBits()) {
+			hiServerTask.add(globalHiTasks.get(indice));
+		}
+		this.hiTasks = hiServerTask;
+	}
 }

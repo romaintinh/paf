@@ -20,13 +20,16 @@ public class SolutionExacte {
 	public ArrayList<Task> hiTasks;
 	public ArrayList<Task> loTasks;
 	// variable de la fonction maps
-	TreeMap<AddBitSet,ArrayList<AddBitSet>> maps = new TreeMap<AddBitSet,ArrayList<AddBitSet>>();
+	TreeMap<AddBitSetUnordered,ArrayList<AddBitSet>> maps = new TreeMap<AddBitSetUnordered,ArrayList<AddBitSet>>();
+	ArrayList<AddBitSet> Xsorted = new ArrayList<AddBitSet>();
+	ArrayList<AddBitSetUnordered> Ysorted = new ArrayList<AddBitSetUnordered>();
 	// variable de la fonction récursive
-	public AddBitSet unionY ;
+	public AddBitSetUnordered unionY ;
 	public AddBitSet unionX ;
 	public ArrayList<AddBitSet[]> maxSol = new ArrayList<AddBitSet[]>();
 	public ArrayList<AddBitSet[]> Sol = new ArrayList<AddBitSet[]>();
 	public double maxU =0;
+	
 
 	
 	// constructeur vide à utiliser de pair avec loadFromTxt
@@ -72,7 +75,7 @@ public class SolutionExacte {
 				}
 				this.hi = hiTasks.size();
 				this.lo = loTasks.size();
-				unionY = new AddBitSet(hi);
+				unionY = new AddBitSetUnordered(hi);
 				unionX = new AddBitSet(lo);
 			} catch (FileNotFoundException e) {
 				System.out.println("no such file found");
@@ -90,18 +93,18 @@ public class SolutionExacte {
 		this.loTasks = lot;
 		this.hi = hiTasks.size();
 		this.lo = loTasks.size();
-		unionY = new AddBitSet(hi);
+		unionY = new AddBitSetUnordered(hi);
 		unionX = new AddBitSet(lo);
 	}
 
 		
 	// recherche de la solution récursivement
-	public void recSearch(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps, Iterator<AddBitSet> positionY, ListIterator positionX)
+	public void recSearch(TreeMap<AddBitSetUnordered,ArrayList<AddBitSet>> maps, Iterator<AddBitSetUnordered> positionY, ListIterator positionX)
 	{	
 	//	printSol(Sol);
 		if (positionY == null) 
 		{
-			NavigableSet<AddBitSet> keys = maps.navigableKeySet();
+			Set<AddBitSet> keys = maps.keySet();
 		//	print(keys.toString());
 			positionY = keys.iterator();
 			ArrayList<AddBitSet> values = maps.get(positionY.next()); // probleme avec le next
@@ -200,16 +203,21 @@ public class SolutionExacte {
 	public void maps() 
 	{
 		// variables d'optimisationvaleur de Y atteinte dans maps  {0, 2}
-		ArrayList<AddBitSet> Xsorted = new ArrayList<AddBitSet>();
 		ArrayList<AddBitSet> WrongCombination = new ArrayList<AddBitSet>();
 		AddBitSet temp = new AddBitSet(lo);
 		
 		// variables utiles pour obtenir l'ensemble des mappings valides
 		ArrayList<AddBitSet> tempLo = new ArrayList<AddBitSet>();
 		Server s = new Server();
-		AddBitSet Y = new AddBitSet(hi);
+		AddBitSetUnordered Y = new AddBitSetUnordered(hi);
 		AddBitSet X = new AddBitSet(lo);
 		
+		Y.plusUn();
+		for (int i =1;i<Math.pow(2, hi);i++) 
+		{
+			Ysorted.add((AddBitSetUnordered) Y.clone());
+			Y.plusUn();
+		}
 		// l'orde est important pour parcourir X car les inclusions peuvent simplifier les calculs
 		for (int i =0;i<Math.pow(2, lo);i++) 
 		{
@@ -219,13 +227,11 @@ public class SolutionExacte {
 		Xsorted.sort(AddBitSet.BitSetCardinalityComparator);
 //		printXS(Xsorted); Le code fonctionne jusque là
 		// début de l'exploration de l'espace de solution
-		Y.plusUn();
-		for (int i = 1;i< Math.pow(2, hi);i++) 
+		for (AddBitSetUnordered Ys : Ysorted) 
 		{
-			s.BitSet2ServerHI(Y, hiTasks);
+			s.BitSet2ServerHI(Ys, hiTasks);
 			if (s.testSeqY()==false) 
 			{
-				Y.plusUn();
 				continue;
 			}
 			outerloop:
@@ -233,7 +239,7 @@ public class SolutionExacte {
 			{
 				/* si on a déjà testé une partition de PIlo incluse dans celle que l'on va tester (à Y constant) et qu'elle n'était pas valide
 				 * alors pas besoin de faire les tests, elle non plus n'est pas valable */
-				for(AddBitSet WC : WrongCombination) 
+		/*		for(AddBitSet WC : WrongCombination) 
 				{
 					temp = (AddBitSet) WC.clone();
 					temp.and(Xc);
@@ -241,26 +247,25 @@ public class SolutionExacte {
 					{
 						continue outerloop;
 					}
-				}  
+				}   */
 				s.BitSet2ServerLO(Xc, loTasks);
 				if (s.testSeqX()==false) 
 				{
-					WrongCombination.add(Xc);
+		//			WrongCombination.add((AddBitSet) Xc.clone());
 					break;
 				}  
 				if (s.isDiv()) tempLo.add(Xc);
 				else 
 				{
 					if(s.SDBF()) tempLo.add(Xc);
-					else WrongCombination.add(Xc);
+		//			else WrongCombination.add((AddBitSet) Xc.clone());
 				}
 			}
-			maps.put((AddBitSet)Y.clone(), tempLo);
-			print("valeur de Y atteinte dans maps  " + Y.toString());
-			print(maps.get(Y).toString());
+			maps.put( Ys, tempLo);
+			print("valeur de Y atteinte dans maps  " + Ys.toString());
+			print(maps.get(Ys).toString());
 			tempLo = new ArrayList<AddBitSet>();
-			Y.plusUn();
-			WrongCombination.clear(); 
+	//		WrongCombination.clear(); 
 		}
 	}
 	
@@ -294,7 +299,7 @@ public class SolutionExacte {
 	// trouve la meilleur allocation
 	public void resolution() 
 	{
-		printM(this.maps);
+
 		maps();
 		printM(this.maps);
 		recSearch(maps,null, null);
@@ -317,10 +322,10 @@ public class SolutionExacte {
 		}
 	}
 	
-	public void printM(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps) 
+	public void printM(TreeMap<AddBitSetUnordered,ArrayList<AddBitSet>> maps) 
 	{
-		NavigableSet<AddBitSet> keys = maps.navigableKeySet();
-		for (AddBitSet key : keys) 
+		Set<AddBitSetUnordered> keys = maps.keySet();
+		for (AddBitSetUnordered key : keys) 
 		{
 			print(key.toString()+"   "+maps.get(key).toString());
 		}
@@ -345,4 +350,6 @@ public class SolutionExacte {
 		}
 		if(Xsorted.isEmpty()) print("solution vide");
 	}
+	
+
 }
