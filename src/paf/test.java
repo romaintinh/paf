@@ -18,10 +18,8 @@ public class test {
 		S.resolution();
 
 		
-	/*    Server S1 = new Server(S.hiTasks,S.loTasks);
-		System.out.println(S1.SDBF());
 		
-		loT = (ArrayList<Task>) S.hiTasks;
+/*		loT = (ArrayList<Task>) S.hiTasks;
 		hiT = (ArrayList<Task>) S.loTasks;
 		loT.remove(3);
 		Server S2 = new Server(hiT,loT);

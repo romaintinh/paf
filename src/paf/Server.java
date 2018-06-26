@@ -112,7 +112,7 @@ public class Server {
 	}
 
 	// créer un serveur à partir de bitSet
-	public void BitSet2Server(AddBitSet hi, AddBitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
+	public void BitSet2Server(OrderedAddBitSet hi, OrderedAddBitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
 		for ( int indice : hi.getSetBits()) {
@@ -125,7 +125,7 @@ public class Server {
 		this.loTasks = loServerTask;
 	}
 	
-	public void BitSet2ServerHI(AddBitSet hi, ArrayList<Task> globalHiTasks) {
+	public void BitSet2ServerHI(OrderedAddBitSet hi, ArrayList<Task> globalHiTasks) {
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
 		for ( int indice : hi.getSetBits()) {
 			hiServerTask.add(globalHiTasks.get(indice));
@@ -133,7 +133,7 @@ public class Server {
 		this.hiTasks = hiServerTask;
 	}
 	
-	public void BitSet2ServerLO(AddBitSet lo, ArrayList<Task> globalLoTasks) {
+	public void BitSet2ServerLO(OrderedAddBitSet lo, ArrayList<Task> globalLoTasks) {
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
 		for ( int indice : lo.getSetBits()) {
 			loServerTask.add(globalLoTasks.get(indice));
@@ -165,11 +165,4 @@ public class Server {
 		}
 	}
 
-	public void BitSet2ServerHI(AddBitSetUnordered hi, ArrayList<Task> globalHiTasks) {
-		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
-		for ( int indice : hi.getSetBits()) {
-			hiServerTask.add(globalHiTasks.get(indice));
-		}
-		this.hiTasks = hiServerTask;
-	}
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
 
-public class AddBitSetUnordered extends BitSet implements Comparable<AddBitSetUnordered>
+public class OrderedAddBitSet extends BitSet implements Comparable<OrderedAddBitSet>
 {
 	/**
 	 * 
@@ -13,7 +13,7 @@ public class AddBitSetUnordered extends BitSet implements Comparable<AddBitSetUn
 	public int sizeWhenInstanciated;
 
 	
-	public AddBitSetUnordered(int i) 
+	public OrderedAddBitSet(int i) 
 	{
 		super(i);
 		sizeWhenInstanciated = i;
@@ -67,14 +67,14 @@ public class AddBitSetUnordered extends BitSet implements Comparable<AddBitSetUn
 	}
 	// ajoute un ordre pour pouvoir trier les ensembles de AddBitSet
 		@Override
-		public int compareTo(AddBitSetUnordered o) 
+		public int compareTo(OrderedAddBitSet o) 
 		{
 			return (this.toBin()-o.toBin());
 		}
 		
-		public static Comparator<AddBitSetUnordered> BitSetCardinalityComparator = new Comparator<AddBitSetUnordered>() 
+		public static Comparator<OrderedAddBitSet> BitSetCardinalityComparator = new Comparator<OrderedAddBitSet>() 
 		{
-			public int compare(AddBitSetUnordered AddBitSet1, AddBitSetUnordered AddBitSet2) 
+			public int compare(OrderedAddBitSet AddBitSet1, OrderedAddBitSet AddBitSet2) 
 			{
 				return AddBitSet1.compareTo(AddBitSet2);
 			}
