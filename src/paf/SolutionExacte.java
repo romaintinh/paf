@@ -170,7 +170,7 @@ public class SolutionExacte {
 				AddBitSet[] data = {y,x};
 				Sol.add(data.clone());		
 				printSol(Sol);
-				print(positionY.hasNext());
+		//		print(positionY.hasNext());
 				this.recSearch(maps, positionY, positionX);
 			}
 		}
