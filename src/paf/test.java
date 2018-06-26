@@ -11,7 +11,7 @@ public class test {
 	{
 		
 		SolutionExacte S = new SolutionExacte();
-		S.loadFromTxt("testthese");
+		S.loadFromTxt(arg[0]);
 	/*	printArrayList(S.hiTasks);
 		print("lo");
 		printArrayList(S.loTasks); */

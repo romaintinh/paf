@@ -15,20 +15,19 @@ import java.util.SortedMap;
 
 public class SolutionExacte {
 	// variables constitutives
-	public int stop =0;
 	public int hi;
 	public int lo;
 	public ArrayList<Task> hiTasks;
 	public ArrayList<Task> loTasks;
 	// variable de la fonction maps
-	public TreeMap<AddBitSet,ArrayList<AddBitSet>> maps;
+	TreeMap<AddBitSet,ArrayList<AddBitSet>> maps = new TreeMap<AddBitSet,ArrayList<AddBitSet>>();
 	// variable de la fonction récursive
 	public AddBitSet unionY ;
 	public AddBitSet unionX ;
 	public ArrayList<AddBitSet[]> maxSol = new ArrayList<AddBitSet[]>();
 	public ArrayList<AddBitSet[]> Sol = new ArrayList<AddBitSet[]>();
 	public double maxU =0;
-	public boolean wasLast = false;
+
 	
 	// constructeur vide à utiliser de pair avec loadFromTxt
 	public SolutionExacte() 
@@ -99,8 +98,6 @@ public class SolutionExacte {
 	// recherche de la solution récursivement
 	public void recSearch(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps, Iterator<AddBitSet> positionY, ListIterator positionX)
 	{	
-		stop+=1;
-		if(stop>300) return;
 	//	printSol(Sol);
 		if (positionY == null) 
 		{
@@ -131,6 +128,8 @@ public class SolutionExacte {
 				}
 			}
 			// on explore les solutions suivantes
+			printSol(Sol);
+			if(Sol.isEmpty()) return;
 			Sol.remove(Sol.size()-1);
 			printSol(Sol);
 			// condition d'arret
@@ -148,17 +147,17 @@ public class SolutionExacte {
 			print("pass1");
 			
 			AddBitSet y = positionY.next();
-			if (y.intersects(unionY) || y.equals(unionY)) // cas ou y = {} = unionY pas pris en compte pas intersect
+			if (y.intersects(unionY)) // cas ou y = {} = unionY pas pris en compte pas intersect
 			{
 				print("continue 1");
-				continue;
+				continue ;
 			}
 			while(positionX.hasNext()) 
 			{
-			//	print("pass2");
+				print("pass2");
 				AddBitSet x = (AddBitSet) positionX.next();
 			//	print(x.toString());
-				if (x.intersects(unionX) || x.equals(unionX)) // cas ou x = {} = unionX pas pris en compte pas intersect
+				if (x.intersects(unionX)) // cas ou x = {} = unionX pas pris en compte pas intersect
 				{
 					print("continue 2");
 					continue;
@@ -175,17 +174,17 @@ public class SolutionExacte {
 			}
 		}
 		// il n'y a pas de solution qui commence par le contenu de Sol donc on retire le dernière élément et on continue
-		if (Sol.isEmpty() && positionY.hasNext()==false)
+/*		if (Sol.isEmpty() && positionY.hasNext()==false)
 		{
 			return ;
-		}
+		} */
 		unionY.andNot(Sol.get(Sol.size()-1)[0]);
 		unionX.andNot(Sol.get(Sol.size()-1)[1]);
 		Sol.remove(Sol.size()-1);
 		if (Sol.isEmpty() && positionY.hasNext()==false)
 		{
 			return ;
-		}
+		} 
 		printSol(Sol);
 		positionY = maps.navigableKeySet().tailSet(Sol.get(Sol.size()-1)[0]).iterator();
 		ArrayList<AddBitSet> values = maps.get(positionY.next());
@@ -198,16 +197,14 @@ public class SolutionExacte {
 	
 	// creation de l'ensemble maps qui contient les éléments élémentaires (Y (lot de tâches hi),X (lot de taches lo)) 
 	// suceptible de former une allocation complete
-	public TreeMap<AddBitSet,ArrayList<AddBitSet>> maps() 
+	public void maps() 
 	{
-		
-		// variables d'optimisation
+		// variables d'optimisationvaleur de Y atteinte dans maps  {0, 2}
 		ArrayList<AddBitSet> Xsorted = new ArrayList<AddBitSet>();
 		ArrayList<AddBitSet> WrongCombination = new ArrayList<AddBitSet>();
 		AddBitSet temp = new AddBitSet(lo);
 		
 		// variables utiles pour obtenir l'ensemble des mappings valides
-		TreeMap<AddBitSet,ArrayList<AddBitSet>> maps = new TreeMap<AddBitSet,ArrayList<AddBitSet>>();
 		ArrayList<AddBitSet> tempLo = new ArrayList<AddBitSet>();
 		Server s = new Server();
 		AddBitSet Y = new AddBitSet(hi);
@@ -222,7 +219,8 @@ public class SolutionExacte {
 		Xsorted.sort(AddBitSet.BitSetCardinalityComparator);
 //		printXS(Xsorted); Le code fonctionne jusque là
 		// début de l'exploration de l'espace de solution
-		for (int i = 0;i< Math.pow(2, hi);i++) 
+		Y.plusUn();
+		for (int i = 1;i< Math.pow(2, hi);i++) 
 		{
 			s.BitSet2ServerHI(Y, hiTasks);
 			if (s.testSeqY()==false) 
@@ -243,13 +241,13 @@ public class SolutionExacte {
 					{
 						continue outerloop;
 					}
-				} 
+				}  
 				s.BitSet2ServerLO(Xc, loTasks);
 				if (s.testSeqX()==false) 
 				{
 					WrongCombination.add(Xc);
 					break;
-				} 
+				}  
 				if (s.isDiv()) tempLo.add(Xc);
 				else 
 				{
@@ -257,12 +255,13 @@ public class SolutionExacte {
 					else WrongCombination.add(Xc);
 				}
 			}
-			maps.put((AddBitSet)Y.clone(), new ArrayList<AddBitSet>(tempLo));
+			maps.put((AddBitSet)Y.clone(), tempLo);
+			print("valeur de Y atteinte dans maps  " + Y.toString());
+			print(maps.get(Y).toString());
+			tempLo = new ArrayList<AddBitSet>();
 			Y.plusUn();
-			tempLo.clear();
 			WrongCombination.clear(); 
 		}
-		return maps;
 	}
 	
 	// converti deux AddBitSet en un serveur
@@ -295,8 +294,9 @@ public class SolutionExacte {
 	// trouve la meilleur allocation
 	public void resolution() 
 	{
-		maps = this.maps();
-		printM(maps);
+		printM(this.maps);
+		maps();
+		printM(this.maps);
 		recSearch(maps,null, null);
 		System.out.println("l'utilisation maximale est" + String.valueOf(maxU));
 		System.out.println("la solution qui produit ce résultat est :");
@@ -308,16 +308,21 @@ public class SolutionExacte {
 	}
 	
 	// debug / test
-	public static void printM(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps) 
+	public static void printKeys(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps) 
 	{
 		NavigableSet<AddBitSet> keys = maps.navigableKeySet();
 		for (AddBitSet key : keys) 
 		{
 			System.out.println(key.toString());
-			for (AddBitSet value : maps.get(key)) 
-			{
-				System.out.println("\t"+value.toString());
-			}
+		}
+	}
+	
+	public void printM(TreeMap<AddBitSet,ArrayList<AddBitSet>> maps) 
+	{
+		NavigableSet<AddBitSet> keys = maps.navigableKeySet();
+		for (AddBitSet key : keys) 
+		{
+			print
 		}
 	}
 	
@@ -334,8 +339,10 @@ public class SolutionExacte {
 	}
 	public static void printSol(ArrayList<AddBitSet[]> Xsorted) 
 	{
+		System.out.print("état de la solution  ");
 		for (AddBitSet[] elt : Xsorted) {
 			print(elt[0].toString()+"  "+elt[1].toString());
 		}
+		if(Xsorted.isEmpty()) print("solution vide");
 	}
 }
