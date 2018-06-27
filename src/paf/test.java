@@ -12,6 +12,29 @@ public class test {
 		
 		SolutionExacte S = new SolutionExacte();
 		S.loadFromTxt(arg[0]);
+	/*	S.loadFromTxt("testServeur");
+		Server S2 = new Server();
+		OrderedAddBitSet Y =new OrderedAddBitSet(1);
+		Y.plusUn();
+		OrderedAddBitSet X =new OrderedAddBitSet(2);
+		X.plusUn();
+		X.plusUn();
+		X.plusUn();
+		print(Y.toString());
+		print(X.toString());
+		S2.BitSet2ServerHI(Y, S.hiTasks);
+		S2.BitSet2ServerLO(X, S.loTasks);
+		for(Task t : S2.hiTasks) {
+			print(t.period);
+		}
+		
+		for(Task t : S2.loTasks) {
+			print(t.period);
+		}
+		
+		print(S2.testSeqX());
+		print(S2.isDiv());
+		print(S2.SDBF());  */
 	/*	printArrayList(S.hiTasks);
 		print("lo");
 		printArrayList(S.loTasks); */
@@ -42,7 +65,7 @@ public class test {
 		}
 	}
 	
-	public static void print(String L) 
+	public static void print(Object L) 
 	{
 		System.out.println(L);
 	}

@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NavigableSet;
@@ -27,6 +27,7 @@ public class SolutionExacte {
 	public ArrayList<OrderedAddBitSet[]> maxSol = new ArrayList<OrderedAddBitSet[]>();
 	public ArrayList<OrderedAddBitSet[]> Sol = new ArrayList<OrderedAddBitSet[]>();
 	public double maxU =0;
+	public ArrayList<OrderedAddBitSet> keys = new ArrayList<OrderedAddBitSet>();
 
 	
 	// constructeur vide à utiliser de pair avec loadFromTxt
@@ -52,7 +53,7 @@ public class SolutionExacte {
 				{
 					line = line.trim();
 					content = line.split("\t");
-					if (Integer.valueOf(content[5])==1) 
+					if (Integer.valueOf(content[5])==2) 
 					{
 
 						this.hiTasks.add(new Task(Integer.valueOf(content[1]),
@@ -93,114 +94,78 @@ public class SolutionExacte {
 		unionY = new OrderedAddBitSet(hi);
 		unionX = new OrderedAddBitSet(lo);
 	}
-
-		
-	// recherche de la solution récursivement
-	public void recSearch(TreeMap<OrderedAddBitSet,ArrayList<OrderedAddBitSet>> maps, Iterator<OrderedAddBitSet> positionY, ListIterator<OrderedAddBitSet> positionX)
-	{	
-	/* if (stop>300) return;
-		stop+=1;  */
-	//	printSol(Sol);
-		if (positionY == null) 
-		{
-			NavigableSet<OrderedAddBitSet> keys = maps.navigableKeySet();
-		//	print(keys.toString());
-			positionY = keys.iterator();
-			ArrayList<OrderedAddBitSet> values = maps.get(positionY.next());
-			positionX = values.listIterator();
-			positionY = keys.iterator();
-		}
-		//une solution a été trouvé on vérifie sa qualité
-		if (unionY.cardinality() == maps.keySet().size()) 
-		{
-			print("calcul de U");
-			double Utemp=0;
-			for ( OrderedAddBitSet[] Solution : Sol) 
-			{
-				Utemp += this.UtilisationFromBitSet(Solution[1]);
-			}
-			if (Utemp>maxU) 
-			{
-				maxU = Utemp;
-				maxSol.clear();
-				// copie de la solution
-				for (OrderedAddBitSet[] elt : Sol)
-				{
-					maxSol.add(elt.clone());					
-				}
-			}
-			// on explore les solutions suivantes
-			printSol(Sol);
-			if(Sol.isEmpty()) return;
-			// deux cas selon X.hasnext 
-			if (positionX.hasNext()) 
-			{
-		
-			}
-			Sol.remove(Sol.size()-1);
-			printSol(Sol);
-			// condition d'arret
-			if (positionY.hasNext()==false && positionX.hasNext()==false) 
-			{
-				return;
-			}
-			this.recSearch(maps, positionY, positionX);
-		}
-		// la solution partielle n'est pas complète
-		// condition d'arret
-		if (positionY.hasNext()==false && positionX.hasNext()==false) return;
-		while (positionY.hasNext())
-		{	
-			print("pass1");
-			OrderedAddBitSet y = positionY.next();
-			print("y est : " + y.toString());
-			if (y.intersects(unionY)) // cas ou y = {} = unionY pas pris en compte pas intersect
-			{
-				print("continue 1");
-				continue ;
-			}
-			while(positionX.hasNext()) 
-			{
-				print("pass2");
-				OrderedAddBitSet x = (OrderedAddBitSet) positionX.next();
-				print("x est : " + x.toString());
-				if (x.intersects(unionX)) // cas ou x = {} = unionX pas pris en compte pas intersect
-				{
-					print("continue 2");
-					continue;
-				}
-				unionY.or(y);
-				print("unionY est : "+unionY.toString());
-				unionX.or(x);
-				print("unionX est : " + unionX.toString());
-				OrderedAddBitSet[] data = {y,x};
-				Sol.add(data.clone());		
-				printSol(Sol);
-		//		print(positionY.hasNext());
-				this.recSearch(maps, positionY, positionX);
-			}
-		}
-		// il n'y a pas de solution qui commence par le contenu de Sol donc on retire le dernière élément et on continue
-		if (Sol.isEmpty() && positionY.hasNext()==false)
-		{
-			return ;
-		} 
-		unionY.andNot(Sol.get(Sol.size()-1)[0]);
-		unionX.andNot(Sol.get(Sol.size()-1)[1]);
-		Sol.remove(Sol.size()-1);
-		if (Sol.isEmpty() && positionY.hasNext()==false)
-		{
-			return ;
-		} 
-		printSol(Sol);
-		positionY = maps.navigableKeySet().tailSet(Sol.get(Sol.size()-1)[0]).iterator();
-		ArrayList<OrderedAddBitSet> values = maps.get(positionY.next());
-		positionY = maps.navigableKeySet().tailSet(Sol.get(Sol.size()-1)[0]).iterator(); // pour annuler le .next()
-		positionX = values.listIterator(values.indexOf(Sol.get(Sol.size()-1)[1]));
-		printSol(Sol);
-		recSearch(maps,positionY,positionX);		
-	}
 	
+	
+	public Double findBestAllocrec( HashMap<OrderedAddBitSet,OrderedAddBitSet> partialSol, int filteringIndexKeys, int filteringIndexLo, Double uWC ){
+		// on est arrivé au bout de la liste des alloactions par serveurs... le processus de construction de l'allocation est fini. 
+		Double result = new Double(0);
+		OrderedAddBitSet x;
+		OrderedAddBitSet y;
+
+
+		if ( filteringIndexKeys>=keys.size()) {
+			// calculer result
+			
+			for (OrderedAddBitSet allocatedLoTasks : partialSol.values()) {
+				result=result+this.UtilisationFromBitSet(allocatedLoTasks);
+			}
+			System.out.println("Fin de recursion U allocated = "+result.toString()+ "for pallox "+partialSol.size() +partialSol.toString());
+
+		}
+		else { // réaliser les appels récursifs
+			// on vérifie si le serveur du prochain mapping a considérer dans maps est compatible 
+			y = keys.get(filteringIndexKeys);
+			ArrayList<OrderedAddBitSet> xlist= maps.get(y); 
+			OrderedAddBitSet unionY =new OrderedAddBitSet(hi);
+			OrderedAddBitSet unionX =new OrderedAddBitSet(lo);
+			for (OrderedAddBitSet s:partialSol.keySet()) {
+				unionY.or(s);
+
+			}
+			//si non compatible result est egal à findbestAlloc (partisol, indexServeur +1, indexLoTaskset =0)
+			if (y.intersects(unionY)) 
+			{
+				print("Serveur non compatible, on passe au suivant");
+				result = findBestAllocrec(partialSol, filteringIndexKeys+1,0,uWC);
+			}
+			else  {
+
+				HashMap<OrderedAddBitSet,OrderedAddBitSet> pSolwithYX;
+				for (OrderedAddBitSet s: partialSol.values()) {
+					unionX.or(s);
+				}
+				x=xlist.get(filteringIndexLo);
+				//si x non compatible result est egal à findbestAlloc (partisol, indexServeur, indexLoTaskset+1)
+				if (x.intersects(unionX)) 
+				{	
+					print("Mapping non compatible, on passe au suivant");
+					if (filteringIndexLo+1<xlist.size()) {
+						result = findBestAllocrec(partialSol, filteringIndexKeys,filteringIndexLo+1,uWC);}
+					else {		
+						result = findBestAllocrec(partialSol, filteringIndexKeys+1,0,uWC);
+					}
+
+				}		
+				else {// si x compatible calculer le U pour le cas ou on ajoute (x,y) à l'allocation et le cas ou on ne le fait pas, puis on retourne le min des deux. 
+					Double firstcall;
+					Double secondcall;
+					if (filteringIndexLo+1<xlist.size()) 
+					{
+						firstcall=findBestAllocrec(partialSol, filteringIndexKeys,filteringIndexLo+1,uWC);}
+					else {
+						firstcall=findBestAllocrec(partialSol, filteringIndexKeys+1,0,uWC);}	
+
+					pSolwithYX=(HashMap<OrderedAddBitSet, OrderedAddBitSet>) partialSol.clone();
+					pSolwithYX.put(y,x);
+					secondcall = findBestAllocrec(pSolwithYX, filteringIndexKeys+1,0,uWC);
+					result= Double.max(secondcall, firstcall);
+					print("min(a,b)=c"+ firstcall+" "+secondcall+" "+ result);
+				}
+			}
+		}	
+		return result;
+	}
+
 	
 	// creation de l'ensemble maps qui contient les éléments élémentaires (Y (lot de tâches hi),X (lot de taches lo)) 
 	// suceptible de former une allocation complete
@@ -287,15 +252,20 @@ public class SolutionExacte {
 	public void resolution() 
 	{
 		maps();
-		printM(this.maps);
-		recSearch(maps,null, null);
-		System.out.println("l'utilisation maximale est " + String.valueOf(maxU));
-		System.out.println("la solution qui produit ce résultat est :");
-		for (OrderedAddBitSet[] elt : maxSol) 
-		{
-			System.out.print("tache(s) Hi" + elt[0].toString());
-			System.out.println("|    tache(s) Lo" + elt[1].toString());
+		
+		Object[] temp= maps.navigableKeySet().toArray();
+		
+		// acquire set of keys in a ArrayList 
+		
+		for (int i=0;i<temp.length;i++) {
+			this.keys.add((OrderedAddBitSet) temp[i]);
 		}
+		int a = keys.size();
+		printM(this.maps);
+		int filteringIndexKeys =0;
+		int filteringIndexLO =0;
+		HashMap<OrderedAddBitSet,OrderedAddBitSet> partialSol = new HashMap<OrderedAddBitSet,OrderedAddBitSet>();
+		print("U alloué : "+findBestAllocrec( partialSol, filteringIndexKeys, filteringIndexLO, new Double (0) ));
 	}
 	
 	// debug / test
