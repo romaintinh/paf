@@ -1,0 +1,12 @@
+import sys
+import parameter_generating_function
+import fileUtils
+import utils
+import os
+
+def gener
+for i in (0,1000):
+    s=python
+    join(/home/lmillet/Projet-PAF/taskGenerationBaruah/Tasks_on_variation_utilization,s)
+    
+    
