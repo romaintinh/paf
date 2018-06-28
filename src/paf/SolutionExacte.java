@@ -1,13 +1,13 @@
 package paf;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
@@ -45,28 +45,31 @@ public class SolutionExacte {
 		public void loadFromTxt(String name) 
 		{
 			String[] content;
-			String path = "./test/" + name;
+			String path = name;
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(path));
 				String line = br.readLine();
+				System.out.println(line);
 				while(line!=null) 
 				{
 					line = line.trim();
 					content = line.split("\t");
-					if (Integer.valueOf(content[5])==2) 
+					if (content.length<=1) {
+						break; // les fichier contiennent une ligne vide à la fin
+					}
+					if (Integer.valueOf(content[3])==2) 
 					{
-
 						this.hiTasks.add(new Task(Integer.valueOf(content[1]),
-								Double.valueOf(content[3]),
 								Double.valueOf(content[4]),
+								Double.valueOf(content[5]),
 								true));
 					}
 					else 
 					{
 
 						this.loTasks.add(new Task(Integer.valueOf(content[1]),
-								Double.valueOf(content[3]),
 								Double.valueOf(content[4]),
+								new Double(0),
 								false));
 					}
 					line = br.readLine();
@@ -75,13 +78,14 @@ public class SolutionExacte {
 				this.lo = loTasks.size();
 				unionY = new OrderedAddBitSet(hi);
 				unionX = new OrderedAddBitSet(lo);
+				br.close();
 			} catch (FileNotFoundException e) {
 				System.out.println("no such file found");
 				e.printStackTrace();
 			} catch (IOException e) {
 				System.out.println("could not read");
 				e.printStackTrace();
-			}
+			} 
 		}
 	
 	// constructeur complet
@@ -95,8 +99,8 @@ public class SolutionExacte {
 		unionX = new OrderedAddBitSet(lo);
 	}
 	
-	
-	public Double findBestAllocrec( HashMap<OrderedAddBitSet,OrderedAddBitSet> partialSol, int filteringIndexKeys, int filteringIndexLo, Double uWC ){
+	// trouve la meilleur allocation à l'aide de la liste de tous les mapping possible (methode maps())
+	public Double findBestAllocrec( HashMap<OrderedAddBitSet,OrderedAddBitSet> partialSol, int filteringIndexKeys, int filteringIndexLo ){
 		// on est arrivé au bout de la liste des alloactions par serveurs... le processus de construction de l'allocation est fini. 
 		Double result = new Double(0);
 		OrderedAddBitSet x;
@@ -109,7 +113,7 @@ public class SolutionExacte {
 			for (OrderedAddBitSet allocatedLoTasks : partialSol.values()) {
 				result=result+this.UtilisationFromBitSet(allocatedLoTasks);
 			}
-			System.out.println("Fin de recursion U allocated = "+result.toString()+ "for pallox "+partialSol.size() +partialSol.toString());
+	//		System.out.println("Fin de recursion U allocated = "+result.toString()+ "for pallox "+partialSol.size() +partialSol.toString());
 
 		}
 		else { // réaliser les appels récursifs
@@ -125,8 +129,8 @@ public class SolutionExacte {
 			//si non compatible result est egal à findbestAlloc (partisol, indexServeur +1, indexLoTaskset =0)
 			if (y.intersects(unionY)) 
 			{
-				print("Serveur non compatible, on passe au suivant");
-				result = findBestAllocrec(partialSol, filteringIndexKeys+1,0,uWC);
+		//		print("Serveur non compatible, on passe au suivant");
+				result = findBestAllocrec(partialSol, filteringIndexKeys+1,0);
 			}
 			else  {
 
@@ -138,11 +142,11 @@ public class SolutionExacte {
 				//si x non compatible result est egal à findbestAlloc (partisol, indexServeur, indexLoTaskset+1)
 				if (x.intersects(unionX)) 
 				{	
-					print("Mapping non compatible, on passe au suivant");
+		//			print("Mapping non compatible, on passe au suivant");
 					if (filteringIndexLo+1<xlist.size()) {
-						result = findBestAllocrec(partialSol, filteringIndexKeys,filteringIndexLo+1,uWC);}
+						result = findBestAllocrec(partialSol, filteringIndexKeys,filteringIndexLo+1);}
 					else {		
-						result = findBestAllocrec(partialSol, filteringIndexKeys+1,0,uWC);
+						result = findBestAllocrec(partialSol, filteringIndexKeys+1,0);
 					}
 
 				}		
@@ -151,15 +155,15 @@ public class SolutionExacte {
 					Double secondcall;
 					if (filteringIndexLo+1<xlist.size()) 
 					{
-						firstcall=findBestAllocrec(partialSol, filteringIndexKeys,filteringIndexLo+1,uWC);}
+						firstcall=findBestAllocrec(partialSol, filteringIndexKeys,filteringIndexLo+1);}
 					else {
-						firstcall=findBestAllocrec(partialSol, filteringIndexKeys+1,0,uWC);}	
+						firstcall=findBestAllocrec(partialSol, filteringIndexKeys+1,0);}	
 
 					pSolwithYX=(HashMap<OrderedAddBitSet, OrderedAddBitSet>) partialSol.clone();
 					pSolwithYX.put(y,x);
-					secondcall = findBestAllocrec(pSolwithYX, filteringIndexKeys+1,0,uWC);
+					secondcall = findBestAllocrec(pSolwithYX, filteringIndexKeys+1,0);
 					result= Double.max(secondcall, firstcall);
-					print("min(a,b)=c"+ firstcall+" "+secondcall+" "+ result);
+		//			print("min(a,b)=c"+ firstcall+" "+secondcall+" "+ result);
 				}
 			}
 		}	
@@ -180,13 +184,13 @@ public class SolutionExacte {
 		Server s = new Server();
 		OrderedAddBitSet Y = new OrderedAddBitSet(hi);
 		OrderedAddBitSet X = new OrderedAddBitSet(lo);
+		ArrayList<OrderedAddBitSet> WrongMapping = new ArrayList<OrderedAddBitSet>();
 		Y.plusUn();
 		for (int i =1;i<Math.pow(2, hi);i++) 
 		{
 			Ysorted.add((OrderedAddBitSet) Y.clone());
 			Y.plusUn();
 		}
-
 		for (int i =0;i<Math.pow(2, lo);i++) 
 		{
 			Xsorted.add((OrderedAddBitSet) X.clone());
@@ -203,19 +207,32 @@ public class SolutionExacte {
 			}
 			for (OrderedAddBitSet Xc : Xsorted) 
 			{
+				for(OrderedAddBitSet WC : WrongMapping) 
+				{
+					OrderedAddBitSet temp = (OrderedAddBitSet) WC.clone();
+					temp.and(Xc);
+					if(temp.equals(WC)) {
+						break;
+					}
+				}
 				s.BitSet2ServerLO(Xc, loTasks);
 				if (s.testSeqX()==false) 
 				{
+					WrongMapping.add(Xc);
 					continue;
-				}  
+				}
 				if (s.isDiv()) {
 					tempLo.add(Xc);
 				}
 				else 
 				{
 					if(s.SDBF()) tempLo.add(Xc);
+					else {
+						WrongMapping.add(Xc);
+					}
 				}
 			}
+			WrongMapping.clear();
 			maps.put(Ys, tempLo);
 			tempLo = new ArrayList<OrderedAddBitSet>();
 		}
@@ -249,10 +266,16 @@ public class SolutionExacte {
 	}
 	
 	// trouve la meilleur allocation
-	public void resolution() 
+	public Double resolution() 
 	{
 		maps();
-		
+		Double Umax = new Double(0);
+		for (Task HI : hiTasks) {
+			Umax+= HI.getUHi();
+		}
+		for (Task LO : loTasks) {
+			Umax+= LO.getULo();
+		}
 		Object[] temp= maps.navigableKeySet().toArray();
 		
 		// acquire set of keys in a ArrayList 
@@ -260,12 +283,22 @@ public class SolutionExacte {
 		for (int i=0;i<temp.length;i++) {
 			this.keys.add((OrderedAddBitSet) temp[i]);
 		}
-		int a = keys.size();
-		printM(this.maps);
 		int filteringIndexKeys =0;
 		int filteringIndexLO =0;
 		HashMap<OrderedAddBitSet,OrderedAddBitSet> partialSol = new HashMap<OrderedAddBitSet,OrderedAddBitSet>();
-		print("U alloué : "+findBestAllocrec( partialSol, filteringIndexKeys, filteringIndexLO, new Double (0) ));
+		Double U =Umax - findBestAllocrec( partialSol, filteringIndexKeys, filteringIndexLO);
+		return U;
+	}
+	
+
+	public void WriteResult(String name,String path, Double U) {
+		try {
+			BufferedWriter BW = new BufferedWriter(new FileWriter(path+"/"+"ExactResult.csv",true));
+			BW.write(path+name+","+U.toString()+"\n");
+			BW.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// debug / test

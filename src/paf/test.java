@@ -1,73 +1,26 @@
 package paf;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.BitSet;
 
 
 public class test {
-	@SuppressWarnings("unchecked")
 	public static void main (String arg[]) 
 	{
-		
-		SolutionExacte S = new SolutionExacte();
-		S.loadFromTxt(arg[0]);
-	/*	S.loadFromTxt("testServeur");
-		Server S2 = new Server();
-		OrderedAddBitSet Y =new OrderedAddBitSet(1);
-		Y.plusUn();
-		OrderedAddBitSet X =new OrderedAddBitSet(2);
-		X.plusUn();
-		X.plusUn();
-		X.plusUn();
-		print(Y.toString());
-		print(X.toString());
-		S2.BitSet2ServerHI(Y, S.hiTasks);
-		S2.BitSet2ServerLO(X, S.loTasks);
-		for(Task t : S2.hiTasks) {
-			print(t.period);
-		}
-		
-		for(Task t : S2.loTasks) {
-			print(t.period);
-		}
-		
-		print(S2.testSeqX());
-		print(S2.isDiv());
-		print(S2.SDBF());  */
-	/*	printArrayList(S.hiTasks);
-		print("lo");
-		printArrayList(S.loTasks); */
-		S.resolution();
-
-		
-		
-/*		loT = (ArrayList<Task>) S.hiTasks;
-		hiT = (ArrayList<Task>) S.loTasks;
-		loT.remove(3);
-		Server S2 = new Server(hiT,loT);
-		System.out.println(S2.isDiv());
-		
-		loT = (ArrayList<Task>) S.hiTasks;
-		hiT = (ArrayList<Task>) S.loTasks;
-		Server S3 = new Server(hiT,loT);
-		System.out.println(S3.isDiv());
-*/
-	}
-	
-	public static void printArrayList(ArrayList<Task> L) 
-	{
-		for (Task t : L) 
-		{
-			System.out.print(t.period+"\t");
-			System.out.print(t.cHi+"\t");
-			System.out.println(t.cLo);
+		File folder = new File(arg[0]); 
+		File[] subFolder = folder.listFiles();
+		for (File f : subFolder) {
+			if (f.isDirectory()) { // seul les dossiers contiennent les fichier contenant des lots de tâches
+				File[] expFile = f.listFiles();
+				for (File sf : expFile) { // pour tout lots de tâche
+					if(sf.getName().contains("modal")) continue; // le fichier contenant "modal" n'est pas un lot de tâche
+					SolutionExacte S = new SolutionExacte();
+					S.loadFromTxt(sf.getAbsolutePath());
+					S.WriteResult(sf.getName(),arg[0], S.resolution());
+				}
+			}
 		}
 	}
-	
-	public static void print(Object L) 
-	{
-		System.out.println(L);
-	}
-
 }

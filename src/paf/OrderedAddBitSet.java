@@ -19,7 +19,8 @@ public class OrderedAddBitSet extends BitSet implements Comparable<OrderedAddBit
 		sizeWhenInstanciated = i;
 	}
 	
-	public int toBin() {
+	// converti le bitset en nombre binaire (pour la relation d'ordre)
+	private int toBin() {
 		int res =0;
 		for (int i=0;i<sizeWhenInstanciated;i++) {
 			if (this.get(i)) res+=Math.pow(2, i);

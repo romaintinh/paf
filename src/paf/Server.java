@@ -23,6 +23,7 @@ public class Server {
 		this.loTasks =loTasks ;
 		this.hyperP = HyperPeriod();
 	}
+	
 	// renvoie l'utilisation haute du serveur
 	private double UHi() {
 		double resultat =0;
@@ -31,6 +32,7 @@ public class Server {
 		}
 		return resultat;
 	}
+	
 	// renvoie l'utilisation basse du serveur
 	private double ULo() {
 		double resultat =0;
@@ -40,11 +42,9 @@ public class Server {
 		return resultat;
 	}
 	
-	// test du premier critère de "Scheduability"
+	// test du premier critère de "Scheduability" reposant sur la divisibilité de la période de chaque tâche lo par celle de chaque tâche hi
 	public boolean isDiv() {
-		
-		
-		// possibilité de stocker les valeurs déjà testés pour gagner du temps
+		// vérification de la divisibilité
 		for(Task hiTask : hiTasks) {
 			for (Task loTask : loTasks) {
 				if (loTask.period%hiTask.period!=0) 
@@ -54,6 +54,7 @@ public class Server {
 				
 			}
 		}
+		// vérification de la condition sur l'utilisation
 		if (ULo()>UHi()) return false;
 		return true;
 	}
@@ -86,7 +87,7 @@ public class Server {
 		return true;
 	}
 	
-	
+	// ppcm de deux entiers
 	private int PPCM(int a, int b){
 		int A=a;
 		int B=b;
@@ -97,7 +98,7 @@ public class Server {
 		return A;
 	}
 	
-	// ppcm des periode d'un ensemble de taches
+	// ppcm des periodes d'un ensemble de taches
 	public int HyperPeriod() {		
 		ArrayList<Task> list = new ArrayList<Task>();
 		list.addAll(hiTasks);
@@ -111,7 +112,7 @@ public class Server {
 		return ppcm;
 	}
 
-	// créer un serveur à partir de bitSet
+	// remplissage des tâches hi et lo à partir d'un OrderedAddbitSet
 	public void BitSet2Server(OrderedAddBitSet hi, OrderedAddBitSet lo, ArrayList<Task> globalHiTasks, ArrayList<Task> globalLoTasks) {
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
@@ -124,7 +125,7 @@ public class Server {
 		this.hiTasks = hiServerTask;
 		this.loTasks = loServerTask;
 	}
-	
+	// remplissage des tâches hi à partir d'un OrderedAddbitSet
 	public void BitSet2ServerHI(OrderedAddBitSet hi, ArrayList<Task> globalHiTasks) {
 		ArrayList<Task> hiServerTask = new ArrayList<Task>() ;
 		for ( int indice : hi.getSetBits()) {
@@ -132,7 +133,7 @@ public class Server {
 		}
 		this.hiTasks = hiServerTask;
 	}
-	
+	// remplissage des tâches lo à partir d'un OrderedAddbitSet
 	public void BitSet2ServerLO(OrderedAddBitSet lo, ArrayList<Task> globalLoTasks) {
 		ArrayList<Task> loServerTask = new ArrayList<Task>() ;
 		for ( int indice : lo.getSetBits()) {
@@ -154,7 +155,7 @@ public class Server {
 		if (temp>1) return false;
 		return true;
 	}
-	
+	// utilisé pour le debogage
 	public static void printArrayList(ArrayList<Task> L) 
 	{
 		for (Task t : L) 

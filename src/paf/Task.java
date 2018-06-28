@@ -18,10 +18,12 @@ public class Task {
 		this.hiPriority = hiPriority;
 	}
 	
+	// renvoie l'utilisation en régime lo
 	public double getULo() {
 		return cLo/period;
 	}
 	
+	// renvoie l'utilisation en régime hi
 	public double getUHi() {
 		return cHi/period;
 	}
