@@ -1,0 +1,12 @@
+import os
+import fileUtils
+import packingUtils
+import numpy as np
+
+
+folder_solves_path=str(sys.argv[1])
+for roots,dirs,files in os.walk(folder_solves_path):
+    for names in files:
+        file_solved_path=folder_solves_path+str(names)
+        
+        

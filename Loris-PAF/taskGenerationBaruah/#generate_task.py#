@@ -1,0 +1,40 @@
+import sys
+import parameter_generating_function
+import fileUtils
+import utils
+
+period_min = int(sys.argv[1])
+period_max = int(sys.argv[2])
+utilization_min = float(sys.argv[3])
+utilization_max = float(sys.argv[4])
+ratio_min = float(sys.argv[5])
+ratio_max = float(sys.argv[6])
+probability_hi_task = float(sys.argv[7])
+utilization_limit = float(sys.argv[8])
+path_to_write_task_files = str(sys.argv[9])
+nb_processor = int(sys.argv[10])
+
+utilization_lo = 0.
+utilization_hi_hi = 0.
+utilization_task_set = 0.
+ratio_hi_lo = 0.
+utilization_lo_list = []
+period_list = []
+task_hi_index = []
+utilization_hi_list = []
+def generate(period_min, period_max, utilization_min, utilization_max, ratio_min, ratio_max, probaility_hi_task, utilization_limit, path_to_task, nb_processors):
+    
+alue_lo,utilization_limit-utilization_lo))
+		last_hi = False				
+	utilization_lo += utilization_lo_list[-1]
+			
+fileUtils.Write_Task_Parameter(period_list, utilization_lo_list, utilization_hi_list, task_hi_index, path_to_write_task_files,nb_processor)
+	
+	
+		
+
+		
+
+
+
+

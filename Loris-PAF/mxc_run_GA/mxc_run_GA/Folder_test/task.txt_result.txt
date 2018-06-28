@@ -1,0 +1,4 @@
+Folder_test/task.txt,Folder_test/task.txt_modal_server_allocation.txt,6,2.6,1.75,0.85,1.95,1.2,3
+Folder_test/task.txt,Folder_test/task.txt_modal_server_allocation.txt,6,2.6,1.75,0.85,1.95,1.2,3
+Folder_test/task.txt,Folder_test/task.txt_modal_server_allocation.txt,6,2.6,1.75,0.85,1.95,1.2,3
+Folder_test/task.txt,Folder_test/task.txt_modal_server_allocation.txt,6,2.6,1.75,0.85,1.95,1.2,3
